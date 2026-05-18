@@ -1,4 +1,5 @@
 pub mod config;
+pub mod telegram;
 
 #[tokio::main]
 async fn main() {
