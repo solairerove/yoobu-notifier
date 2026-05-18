@@ -1,5 +1,6 @@
 pub mod config;
 pub mod telegram;
+pub mod processors;
 
 #[tokio::main]
 async fn main() {
