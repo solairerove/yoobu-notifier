@@ -1,6 +1,8 @@
-pub mod config;
-pub mod telegram;
-pub mod processors;
+mod config;
+mod processors;
+mod telegram;
+
+use sqlx::postgres::PgPoolOptions;
 
 #[tokio::main]
 async fn main() {
@@ -13,7 +15,20 @@ async fn main() {
         )
         .init();
 
-    let _config = config::Config::from_env();
+    let config = config::Config::from_env();
 
-    tracing::info!("yoobu-notifier starting...");
+    let pool = PgPoolOptions::new()
+        .max_connections(5)
+        .connect(&config.database_url)
+        .await
+        .expect("failed to connect to database");
+
+    tracing::info!("connected to database");
+
+    let telegram = telegram::TelegramClient::new();
+    let processor = processors::Processor::new(pool, telegram);
+
+    tracing::info!("yoobu-notifier started");
+
+    processor.run().await;
 }

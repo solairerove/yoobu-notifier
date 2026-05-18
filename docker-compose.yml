@@ -1,0 +1,14 @@
+services:
+  yoobu-notifier:
+    build: .
+    container_name: yoobu-notifier
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://yoobu:yoobu@yoobu-postgres:5432/yoobu
+      RUST_LOG: yoobu_notifier=debug
+    networks:
+      - yoobu-net
+
+networks:
+  yoobu-net:
+    external: true

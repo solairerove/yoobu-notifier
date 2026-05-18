@@ -1,7 +1,6 @@
 use crate::telegram::TelegramClient;
 use serde_json::Value;
-use sqlx::postgres::PgRow;
-use sqlx::{Error, PgPool, Row};
+use sqlx::{PgPool, Row};
 
 pub struct Processor {
     pool: PgPool,
@@ -27,6 +26,18 @@ impl Processor {
             .expect("failed to listen");
 
         tracing::info!("listening on notification_outbox channel");
+
+        self.process_pending().await;
+
+        loop {
+            match listener.recv().await {
+                Ok(_) => self.process_pending().await,
+                Err(e) => {
+                    tracing::error!("pg listener error: {}", e);
+                    tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+                }
+            }
+        }
     }
 
     async fn process_pending(&self) {
@@ -87,7 +98,7 @@ impl Processor {
             .await
             .ok()
             .flatten()
-            .and_then(|row| row.get("bot_token"))
+            .and_then(|row| row.try_get("bot_token").ok())
             .filter(|t: &String| !t.is_empty())
     }
 
