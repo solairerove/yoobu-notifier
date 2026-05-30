@@ -4,8 +4,8 @@ services:
     container_name: yoobu-notifier
     restart: unless-stopped
     environment:
-      DATABASE_URL: postgres://yoobu:yoobu@yoobu-postgres:5432/yoobu
-      RUST_LOG: yoobu_notifier=debug
+      DATABASE_URL: ${DATABASE_URL}
+      RUST_LOG: ${RUST_LOG:-yoobu_notifier=info}
     networks:
       - yoobu-net
 
