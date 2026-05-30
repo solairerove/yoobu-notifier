@@ -4,7 +4,9 @@ services:
     container_name: yoobu-notifier
     restart: unless-stopped
     environment:
-      DATABASE_URL: ${DATABASE_URL}
+      DB_URL: ${DB_URL}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
       RUST_LOG: ${RUST_LOG:-yoobu_notifier=info}
     networks:
       - yoobu-net

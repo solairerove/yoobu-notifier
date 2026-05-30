@@ -26,15 +26,10 @@ The bot token is fetched from the `tenant` table by `tenant_id` from the payload
 
 | Variable | Description | Example |
 |---|---|---|
-| `DATABASE_URL` | Full connection URL (local dev) | `postgres://yoobu:yoobu@localhost:5432/yoobu` |
-| `DB_HOST` | DB host (prod / Railway) | `containers-us-west-1.railway.app` |
-| `DB_PORT` | DB port | `5432` |
-| `DB_USER` | DB user | `postgres` |
-| `DB_PASSWORD` | DB password | `secret` |
-| `DB_NAME` | DB name | `railway` |
+| `DB_URL` | JDBC-style connection URL | `jdbc:postgresql://localhost:5432/yoobu` |
+| `DB_USER` | DB user | `yoobu` |
+| `DB_PASS` | DB password | `secret` |
 | `RUST_LOG` | Log level | `yoobu_notifier=info` |
-
-Either `DATABASE_URL` **or** the individual `DB_*` variables must be set. `DATABASE_URL` takes priority if both are present.
 
 Copy `.env.example` to `.env` and fill in the values:
 
@@ -95,15 +90,11 @@ docker build -t yoobu-notifier .
 
 The service is deployed as a separate Railway service within the same project as `yoobu-api`.
 
-Add a PostgreSQL service to the project, then set the following environment variables on the `yoobu-notifier` service:
+The service shares variables with `yoobu-api` at the project level:
 
 | Variable | Value |
 |---|---|
-| `DB_HOST` | `${{Postgres.PGHOST}}` |
-| `DB_PORT` | `${{Postgres.PGPORT}}` |
+| `DB_URL` | `jdbc:postgresql://postgres.railway.internal:5432/railway` |
 | `DB_USER` | `${{Postgres.PGUSER}}` |
-| `DB_PASSWORD` | `${{Postgres.PGPASSWORD}}` |
-| `DB_NAME` | `${{Postgres.PGDATABASE}}` |
+| `DB_PASS` | `${{Postgres.PGPASSWORD}}` |
 | `RUST_LOG` | `yoobu_notifier=info` |
-
-SSL is enabled automatically when individual credentials are used (`sslmode=require`).
