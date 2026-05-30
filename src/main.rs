@@ -1,4 +1,4 @@
-mod config;
+mod settings;
 mod processors;
 mod telegram;
 
@@ -15,7 +15,7 @@ async fn main() {
         )
         .init();
 
-    let config = config::Config::from_env();
+    let config = settings::Settings::from_env();
 
     let pool = PgPoolOptions::new()
         .max_connections(5)
