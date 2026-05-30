@@ -1,17 +1,15 @@
-# syntax=docker/dockerfile:1
-
 # ── Stage 1: Builder ──────────────────────────────────────────────────────────
 FROM rust:slim-bookworm AS builder
 
 WORKDIR /app
 
 COPY Cargo.toml Cargo.lock ./
-COPY src/ src/
+RUN mkdir src && echo "fn main() {}" > src/main.rs \
+    && cargo build --release \
+    && rm -rf src
 
-RUN --mount=type=cache,id=cargo-registry,target=/usr/local/cargo/registry \
-    --mount=type=cache,id=cargo-target,target=/app/target \
-    cargo build --release \
-    && cp target/release/yoobu-notifier /tmp/yoobu-notifier
+COPY src/ src/
+RUN touch src/main.rs && cargo build --release
 
 # ── Stage 2: Runtime ──────────────────────────────────────────────────────────
 FROM debian:bookworm-slim
@@ -20,6 +18,6 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /tmp/yoobu-notifier /usr/local/bin/yoobu-notifier
+COPY --from=builder /app/target/release/yoobu-notifier /usr/local/bin/yoobu-notifier
 
 CMD ["yoobu-notifier"]
