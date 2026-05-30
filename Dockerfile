@@ -3,13 +3,8 @@ FROM rust:slim-bookworm AS builder
 
 WORKDIR /app
 
-COPY Cargo.toml Cargo.lock ./
-RUN mkdir src && echo "fn main() {}" > src/main.rs \
-    && cargo build --release \
-    && rm -rf src
-
-COPY src/ src/
-RUN touch src/main.rs && cargo build --release
+COPY . .
+RUN cargo build --release
 
 # ── Stage 2: Runtime ──────────────────────────────────────────────────────────
 FROM debian:bookworm-slim
