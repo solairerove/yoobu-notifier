@@ -26,8 +26,10 @@ The bot token is fetched from the `tenant` table by `tenant_id` from the payload
 
 | Variable | Description | Example |
 |---|---|---|
-| `DATABASE_URL` | PostgreSQL connection URL | `postgres://yoobu:yoobu@localhost:5432/yoobu` |
-| `RUST_LOG` | Log level | `yoobu_notifier=debug` |
+| `DB_URL` | JDBC-style connection URL | `jdbc:postgresql://localhost:5432/yoobu` |
+| `DB_USER` | DB user | `yoobu` |
+| `DB_PASS` | DB password | `secret` |
+| `RUST_LOG` | Log level | `yoobu_notifier=info` |
 
 Copy `.env.example` to `.env` and fill in the values:
 
@@ -86,12 +88,13 @@ docker build -t yoobu-notifier .
 
 ## Deploying to Railway
 
-The service is deployed as a separate Railway service within the same project as `yoobu-api`.  
-`DATABASE_URL` is shared as a project-level variable.
+The service is deployed as a separate Railway service within the same project as `yoobu-api`.
 
-Environment variables on Railway:
+The service shares variables with `yoobu-api` at the project level:
 
-```
-DATABASE_URL   — shared project variable
-RUST_LOG       = yoobu_notifier=info
-```
+| Variable | Value |
+|---|---|
+| `DB_URL` | `jdbc:postgresql://postgres.railway.internal:5432/railway` |
+| `DB_USER` | `${{Postgres.PGUSER}}` |
+| `DB_PASS` | `${{Postgres.PGPASSWORD}}` |
+| `RUST_LOG` | `yoobu_notifier=info` |
